@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { toPng } from "html-to-image";
 import html2canvas from "html2canvas";
+import image1Src from "../assets/D21.png";
 
 function downloadImage(imageUrl, filename) {
   const link = document.createElement("a");
@@ -16,10 +17,11 @@ defineProps({
 });
 
 const count = ref(0);
+const image1 = image1Src;
 
 const handleClick1 = () => {
   // console.log(document.getElementById("shaka"));
-  toPng(document.getElementById("shaka"))
+  toPng(document.getElementById("shaka"), { cacheBust: false })
     .then((dataUrl) => {
       // console.log(dataUrl);
       const filename = "qq.png";
@@ -34,11 +36,13 @@ const handleClick1 = () => {
 };
 
 const handleClick2 = () => {
-  html2canvas(document.getElementById("shaka")).then((canvas) => {
-    const myImage = canvas.toDataURL();
-    const filename = "qq.png";
-    downloadImage(myImage, filename);
-  });
+  html2canvas(document.getElementById("shaka"), { useCORS: true }).then(
+    (canvas) => {
+      const myImage = canvas.toDataURL();
+      const filename = "qq.png";
+      downloadImage(myImage, filename);
+    }
+  );
 };
 </script>
 
@@ -46,7 +50,7 @@ const handleClick2 = () => {
   <div class="container">
     <!-- shared image -->
     <div ref="sharedContent" class="relative" id="shaka">
-      <div class="share-content">
+      <div class="share-content" :style="{ backgroundImage: `url(${image1})` }">
         <!-- invisible shared content -->
         <div class="timestamp">timestamp: 5566</div>
         <h2 class="type-title">FUTURES</h2>
@@ -83,7 +87,7 @@ const handleClick2 = () => {
   color: #fff;
 }
 .share-content {
-  background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D21.png);
+  /* background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D21.png); */
 }
 .share-dialog-body {
   padding: 0 8px 12px;
