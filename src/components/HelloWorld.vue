@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { toPng } from "html-to-image";
 import html2canvas from "html2canvas";
-import image1Src from "../assets/D21.png";
+import image1Src from "../assets/D22.png";
 
 function downloadImage(imageUrl, filename) {
   const link = document.createElement("a");
@@ -21,7 +21,7 @@ const image1 = image1Src;
 
 const handleClick1 = () => {
   // console.log(document.getElementById("shaka"));
-  toPng(document.getElementById("shaka"), { cacheBust: false })
+  toPng(document.getElementById("shaka"))
     .then((dataUrl) => {
       // console.log(dataUrl);
       const filename = "qq.png";
@@ -36,13 +36,11 @@ const handleClick1 = () => {
 };
 
 const handleClick2 = () => {
-  html2canvas(document.getElementById("shaka"), { useCORS: true }).then(
-    (canvas) => {
-      const myImage = canvas.toDataURL();
-      const filename = "qq.png";
-      downloadImage(myImage, filename);
-    }
-  );
+  html2canvas(document.getElementById("shaka")).then((canvas) => {
+    const myImage = canvas.toDataURL();
+    const filename = "qq.png";
+    downloadImage(myImage, filename);
+  });
 };
 </script>
 
