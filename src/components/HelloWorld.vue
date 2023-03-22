@@ -13,6 +13,27 @@ function downloadImage(imageUrl, filename) {
   link.remove();
 }
 
+async function shareImage({ imageUrl, text, url }, filename = "shared.png") {
+  const blob = await (await fetch(imageUrl)).blob();
+  const filesArray = [
+    new File([blob], filename, {
+      type: blob.type,
+      lastModified: new Date().getTime(),
+    }),
+  ];
+  const shareData = {
+    files: filesArray,
+    text: "I have a fream",
+    url: "https://shaka-joe.com",
+    title: "TITLE 87",
+  };
+  if (navigator.share) {
+    navigator.share(shareData);
+  } else {
+    downloadImage(imageUrl, filename);
+  }
+}
+
 defineProps({
   msg: String,
 });
@@ -26,7 +47,7 @@ const handleClick1 = () => {
     .then((dataUrl) => {
       // console.log(dataUrl);
       const filename = "qq.png";
-      downloadImage(dataUrl, filename);
+      shareImage({ imageUrl: dataUrl }, filename);
     })
     .catch((err) => {
       console.log(err);
@@ -41,7 +62,7 @@ const handleClick2 = () => {
     (canvas) => {
       const myImage = canvas.toDataURL();
       const filename = "qq.png";
-      downloadImage(myImage, filename);
+      shareImage({ imageUrl: myImage }, filename);
     }
   );
 };
@@ -51,7 +72,7 @@ const handleClick3 = () => {
     .toPng(document.getElementById("shaka"))
     .then(function (dataUrl) {
       const filename = "qq.png";
-      downloadImage(dataUrl, filename);
+      shareImage({ imageUrl: dataUrl }, filename);
     })
     .catch(function (error) {
       console.error("oops, something went wrong!", error);
@@ -101,7 +122,7 @@ const handleClick3 = () => {
   color: #fff;
 }
 .share-content {
-  background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D21.png);
+  background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D31.png);
 }
 .share-dialog-body {
   padding: 0 8px 12px;
