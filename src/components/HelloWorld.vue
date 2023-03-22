@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { toPng } from "html-to-image";
 import html2canvas from "html2canvas";
+import domtoimage from "dom-to-image";
 import image1Src from "../assets/D22.png";
 
 function downloadImage(imageUrl, filename) {
@@ -36,11 +37,25 @@ const handleClick1 = () => {
 };
 
 const handleClick2 = () => {
-  html2canvas(document.getElementById("shaka")).then((canvas) => {
-    const myImage = canvas.toDataURL();
-    const filename = "qq.png";
-    downloadImage(myImage, filename);
-  });
+  html2canvas(document.getElementById("shaka"), { useCORS: true }).then(
+    (canvas) => {
+      const myImage = canvas.toDataURL();
+      const filename = "qq.png";
+      downloadImage(myImage, filename);
+    }
+  );
+};
+
+const handleClick3 = () => {
+  domtoimage
+    .toPng(document.getElementById("shaka"))
+    .then(function (dataUrl) {
+      const filename = "qq.png";
+      downloadImage(dataUrl, filename);
+    })
+    .catch(function (error) {
+      console.error("oops, something went wrong!", error);
+    });
 };
 </script>
 
@@ -48,7 +63,7 @@ const handleClick2 = () => {
   <div class="container">
     <!-- shared image -->
     <div ref="sharedContent" class="relative" id="shaka">
-      <div class="share-content" :style="{ backgroundImage: `url(${image1})` }">
+      <div class="share-content">
         <!-- invisible shared content -->
         <div class="timestamp">timestamp: 5566</div>
         <h2 class="type-title">FUTURES</h2>
@@ -75,8 +90,9 @@ const handleClick2 = () => {
     </div>
   </div>
 
-  <button id="save-btn" @click="handleClick1">Save 1</button>
-  <button id="save-btn" @click="handleClick2">Save 2</button>
+  <button id="save-btn" @click="handleClick1">html-to-image</button>
+  <button id="save-btn" @click="handleClick2">html2canvas</button>
+  <button id="save-btn" @click="handleClick3">dom-to-image</button>
 </template>
 
 <style scoped>
@@ -85,7 +101,7 @@ const handleClick2 = () => {
   color: #fff;
 }
 .share-content {
-  /* background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D21.png); */
+  background-image: url(https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/D21.png);
 }
 .share-dialog-body {
   padding: 0 8px 12px;
