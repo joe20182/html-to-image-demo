@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { toPng } from "html-to-image";
 import html2canvas from "html2canvas";
 import domtoimage from "dom-to-image";
+import QrcodeVue from "qrcode.vue";
 import image1Src from "../assets/D22.png";
 
 function downloadImage(imageUrl, filename) {
@@ -23,9 +24,8 @@ async function shareImage({ imageUrl, text, url }, filename = "shared.png") {
   ];
   const shareData = {
     files: filesArray,
-    text: "I have a fream",
+    text: "I have a dream",
     url: "https://shaka-joe.com",
-    title: "TITLE 87",
   };
   if (navigator.share) {
     navigator.share(shareData);
@@ -38,8 +38,30 @@ defineProps({
   msg: String,
 });
 
-const count = ref(0);
+const sharedContent = ref(null);
+const tmpImgSlot = ref(null);
+const share = ref({
+  leverage: true,
+  pnl: true,
+  price: true,
+});
 const image1 = image1Src;
+const qrLogoImg = `https://d2refp30laz1gf.cloudfront.net/btse/sharePnlBg/qrLogo.png`;
+
+const getDom = () => {
+  const oldCanvas = sharedContent.value.querySelector("canvas");
+  const sharedDom = sharedContent.value.cloneNode(true);
+  // 顯示下載圖片要加上的內容
+  sharedDom.style.borderRadius = "16px";
+  sharedDom.style.overflow = "hidden";
+  sharedDom.querySelector(".timestamp").style.display = "flex";
+  sharedDom.querySelector(".share-info").style.display = "flex";
+  const newCanvas = sharedDom.querySelector("canvas").getContext("2d");
+  newCanvas.drawImage(oldCanvas, 0, 0);
+  tmpImgSlot.value.append(sharedDom);
+
+  return tmpImgSlot.value;
+};
 
 const handleClick1 = () => {
   // console.log(document.getElementById("shaka"));
@@ -58,13 +80,16 @@ const handleClick1 = () => {
 };
 
 const handleClick2 = () => {
-  html2canvas(document.getElementById("shaka"), { useCORS: true }).then(
-    (canvas) => {
+  const dom = getDom();
+  html2canvas(dom, { useCORS: true })
+    .then((canvas) => {
       const myImage = canvas.toDataURL();
       const filename = "qq.png";
       shareImage({ imageUrl: myImage }, filename);
-    }
-  );
+    })
+    .finally(() => {
+      dom.remove();
+    });
 };
 
 const handleClick3 = () => {
@@ -85,8 +110,7 @@ const handleClick3 = () => {
     <!-- shared image -->
     <div ref="sharedContent" class="relative" id="shaka">
       <div class="share-content">
-        <!-- invisible shared content -->
-        <div class="timestamp">timestamp: 5566</div>
+        <div v-show="false" class="timestamp">timestamp: 5566</div>
         <h2 class="type-title">FUTURES</h2>
         <div class="roe-area positive">
           <div class="percentage">+ 87%</div>
@@ -108,6 +132,23 @@ const handleClick3 = () => {
           </div>
         </div>
       </div>
+      <!-- invisible shared content -->
+      <div v-show="false" class="share-info">
+        <div class="qr-wrapper">
+          <QrcodeVue :size="68" value="referralLink" />
+          <img class="qr-logo" :src="qrLogoImg" />
+        </div>
+        <div class="info-body">
+          <div class="ref-area">
+            <div class="ref-text">REFERAL CODE</div>
+            <div class="ref-code">{{ "refCode" }}</div>
+            <div class="promo-text">Hahaha 87 UCCU :)</div>
+          </div>
+          <div class="domain">QOO.COM</div>
+        </div>
+      </div>
+      <!-- for rendering download image in a invisible place -->
+      <div ref="tmpImgSlot" class="tmp-img-slot"></div>
     </div>
   </div>
 
@@ -116,7 +157,7 @@ const handleClick3 = () => {
   <button id="save-btn" @click="handleClick3">dom-to-image</button>
 </template>
 
-<style scoped>
+<style scoped lang="less">
 .container {
   width: 600px;
   color: #fff;
@@ -192,5 +233,80 @@ const handleClick3 = () => {
 }
 .positive {
   color: #00b15d;
+}
+
+.share-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 20px 14px 20px 28px;
+  background: linear-gradient(
+      89.29deg,
+      rgba(13, 23, 119, 0) 0.23%,
+      rgba(22, 64, 144, 0.43) 107.71%
+    ),
+    #131b29;
+
+  .theme-night & {
+    background: linear-gradient(
+        89.29deg,
+        rgba(13, 23, 119, 0) 0.23%,
+        rgba(22, 64, 144, 0.43) 107.71%
+      ),
+      #131b29;
+  }
+
+  .qr-wrapper {
+    position: relative;
+    display: flex;
+    padding: 2px;
+    background-color: #fff;
+
+    > div {
+      display: flex;
+    }
+
+    .qr-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .info-body {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    .ref-area {
+      .ref-text,
+      .ref-code {
+        font-weight: 700;
+      }
+
+      .ref-text {
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      .ref-code {
+        font-size: 16px;
+      }
+
+      .promo-text {
+        font-size: 12px;
+      }
+    }
+
+    .domain {
+      font-size: 14px;
+      font-weight: 500;
+      color: blue;
+      text-transform: uppercase;
+    }
+  }
 }
 </style>
